@@ -4,15 +4,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Data
 public class Ingredients {
+    /**
+     * Идентфикатор ингредиента
+     */
     private int id;
+    /**
+     * Наименование ингредиента
+     */
     @NotBlank(message = "Обязательно введите имя ингредиента")
     private String nameIngredient;
     @Positive

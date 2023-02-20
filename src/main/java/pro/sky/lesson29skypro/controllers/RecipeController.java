@@ -36,7 +36,7 @@ public class RecipeController {
                     @ApiResponse(responseCode = "200", description = "Запись создана"),
                     @ApiResponse(responseCode = "500", description = "Возникли ошибки во время создания записи")
             })
-    public int addRecipe(@RequestBody Recipes recipe) {
+    public int addRecipe(@Valid @RequestBody Recipes recipe) {
         return recipesService.addRecipe(recipe);
     }
 
@@ -77,9 +77,10 @@ public class RecipeController {
                     @ApiResponse(responseCode = "200", description = "Запись удалена")})
 //    или так
     @Parameters(value = {@Parameter(name = "id", example = "1")})
-    ResponseEntity<Void> removeRecipe(@PathVariable int id) {
-        recipesService.removeRecipe(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    ResponseEntity<Recipes> removeRecipe(@PathVariable int id) {
+//        recipesService.removeRecipe(id);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(recipesService.removeRecipe(id));
     }
 
     @GetMapping("/download")
@@ -91,6 +92,7 @@ public class RecipeController {
     public HttpEntity<byte[]> downloadRecipes() {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        header.setContentLength(header.getContentLength());
         header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=recipes.docx");
         return new HttpEntity<>(recipesService.downloadRecipes(), header);
     }

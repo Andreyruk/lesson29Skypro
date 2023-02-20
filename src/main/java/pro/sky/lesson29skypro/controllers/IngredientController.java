@@ -38,7 +38,7 @@ public class IngredientController {
                             content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Ingredients.class))}),
                     @ApiResponse(responseCode = "500", description = "Возникли ошибки во время создания записи")
             })
-    public int addIngredient(@RequestBody Ingredients ingredient) {
+    public int addIngredient(@Valid @RequestBody Ingredients ingredient) {
         return ingredientService.addIngredient(ingredient);
     }
 
@@ -81,12 +81,14 @@ public class IngredientController {
                     @ApiResponse(responseCode = "200", description = "Запись удалена")})
 //    или так
     @Parameters(value = {@Parameter(name = "id", example = "1")})
-    public ResponseEntity<Void> removeIngredients(@PathVariable int id){
-        if (!recipesService.findRecipesByIngredient(id).isEmpty()) {
-            throw new RuntimeException(String.format("Ингредиент с id %s используется", id));
-        }
-        ingredientService.removeIngredients(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+//    public ResponseEntity<Void> removeIngredients(@PathVariable int id){
+//        if (!recipesService.findRecipesByIngredient(id).isEmpty()) {
+//            throw new RuntimeException(String.format("Ингредиент с id %s используется", id));
+//        }
+//        ingredientService.removeIngredients(id);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+    ResponseEntity <Ingredients> removeIngredients(@PathVariable int id){
+        return ResponseEntity.ok(ingredientService.removeIngredients(id));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

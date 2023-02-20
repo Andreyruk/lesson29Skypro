@@ -25,28 +25,30 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RecipesServiceImpl implements RecipesService {
     private TreeMap<Integer, Recipes> recipesMap = new TreeMap<>();
-    @Autowired
     private final IngredientService ingredientService;
     private static int id;
 
-    @Value("${sources.recipes:}")
-    private String directory;
-
-    private String sourceDir;
-
-    @PostConstruct
-    public void checkDirectoryRecipe() {
-        sourceDir = CommonUtils.createDirectory(directory);
-        recipesMap = CommonUtils.readObjects(sourceDir, Recipes.class);
-        if (!recipesMap.isEmpty()) {
-            id = recipesMap.lastKey();
-        }
-    }
+//    @Value("${sources.recipes:}")
+//    private String directory;
+//    private String sourceDir;
+//
+//    @PostConstruct
+//    public void checkDirectoryRecipe() {
+//        sourceDir = CommonUtils.createDirectory(directory);
+//        recipesMap = CommonUtils.readObjects(sourceDir, Recipes.class);
+//        if (!recipesMap.isEmpty()) {
+//            id = recipesMap.lastKey();
+//        }
+//    }
 
     @Override
     public int addRecipe(Recipes recipe) {
-        recipe.setId(++id);
-        writeRecipe(id, recipe);
+//        recipe.setId(++id);
+//        writeRecipe(id, recipe);
+        if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
+            recipe.getIngredients().forEach(ingredientService::addIngredient);
+        }
+        recipesMap.put(id++, recipe);
         return id;
     }
     @Override
@@ -67,36 +69,43 @@ public class RecipesServiceImpl implements RecipesService {
         if (!recipesMap.containsKey(id)) {
             throw new NotFoundException("Рецепт с заданным id не найден");
         }
-        recipes.setId(id);
-        writeRecipe(id, recipes);
-        return recipes;
+        return recipesMap.put(id, recipes);
+//        recipes.setId(id);
+//        writeRecipe(id, recipes);
+//        return recipes;
     }
 
     @Override
-    public void removeRecipe(int id){
+    public Recipes removeRecipe(int id) {
         if (!recipesMap.containsKey(id)) {
             throw new NotFoundException("Рецепт с заданным id отсутствует");
         }
-        if (CommonUtils.deleteFile(String.format("%s/%s.json",sourceDir, id))) {
-            recipesMap.remove(id);
-        } else {
-            throw new RuntimeException(String.format("не удалось удалить рецепт с id %s", id));
-        }
+        return recipesMap.remove(id);
+//    public void removeRecipe(int id){
+//        if (!recipesMap.containsKey(id)) {
+//            throw new NotFoundException("Рецепт с заданным id отсутствует");
+//        }
+//        if (CommonUtils.deleteFile(String.format("%s/%s.json",sourceDir, id))) {
+//            recipesMap.remove(id);
+//        } else {
+//            throw new RuntimeException(String.format("не удалось удалить рецепт с id %s", id));
+//        }
     }
 
-    @Override
-    public List<Recipes> findRecipesByIngredient(int id) {
-        List<Recipes> listRecipes = new ArrayList<>();
-        recipesMap.values().forEach(recipe -> {
-            recipe.getIngredients().forEach(ingredient -> {
-                if (ingredient.getId() == id) {
-                    listRecipes.add(recipe);
-                }
-            });
-        });
-        return listRecipes;
-    }
 
+//    @Override
+//    public List<Recipes> findRecipesByIngredient(int id) {
+//        List<Recipes> listRecipes = new ArrayList<>();
+//        recipesMap.values().forEach(recipe -> {
+//            recipe.getIngredients().forEach(ingredient -> {
+//                if (ingredient.getId() == id) {
+//                    listRecipes.add(recipe);
+//                }
+//            });
+//        });
+//        return listRecipes;
+//    }
+//
     @Override
     public byte[] downloadRecipes() {
         String text = "";
@@ -210,16 +219,16 @@ public class RecipesServiceImpl implements RecipesService {
         return ba.toByteArray();
     }
 
-    private void writeRecipe(int id, Recipes recipe) {
-        recipe.setIngredients(getIngredients(recipe));
-        if (CommonUtils.writeFile(sourceDir, id, recipe)) {
-            recipesMap.put(id, recipe);
-        } else {
-            throw new RuntimeException("Не удалось записать рецепт в файл");
-        }
-    }
-
-    private List<Ingredients> getIngredients(Recipes recipe) {
-        return recipe.getIngredients().stream().map(item -> ingredientService.getIngredient(item.getId())).toList();
-    }
+//    private void writeRecipe(int id, Recipes recipe) {
+//        recipe.setIngredients(getIngredients(recipe));
+//        if (CommonUtils.writeFile(sourceDir, id, recipe)) {
+//            recipesMap.put(id, recipe);
+//        } else {
+//            throw new RuntimeException("Не удалось записать рецепт в файл");
+//        }
+//    }
+//
+//    private List<Ingredients> getIngredients(Recipes recipe) {
+//        return recipe.getIngredients().stream().map(item -> ingredientService.getIngredient(item.getId())).toList();
+//    }
 }

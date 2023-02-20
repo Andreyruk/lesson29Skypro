@@ -14,9 +14,9 @@ public interface RecipesService {
 
     Recipes editRecipe(int id, Recipes recipes);
 
-    void removeRecipe(int id);
+    Recipes removeRecipe(int id);
 
-    List<Recipes> findRecipesByIngredient(int id);
-
+//    List<Recipes> findRecipesByIngredient(int id);
+//
     byte[] downloadRecipes();
 }
